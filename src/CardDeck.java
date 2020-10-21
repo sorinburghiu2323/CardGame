@@ -14,6 +14,13 @@ public class CardDeck implements CardDeckInterface {
     }
 
     @Override
+    public String toString() {
+        return "CardDeck{" +
+                "deck=" + deck +
+                '}';
+    }
+
+    @Override
     public Card removeCardFromTop(Card card) {
         return null;
     }

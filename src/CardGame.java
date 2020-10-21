@@ -1,12 +1,11 @@
-import javax.sound.midi.Soundbank;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class CardGame{
 
     private static int playerNumber;
-    private static ArrayList<Card> pack;
+    private static Stack<Card> pack;
+    private static ArrayList<Object> gameOrder;
 
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -21,10 +20,9 @@ public class CardGame{
         if (!isValidPack) {
             System.out.println("Please add correct pack.");
         }
+        distributeCards();
 
-        for (int i=0; i<playerNumber; i++) {
 
-        }
     }
 
     public static Boolean cardPack(String filename) throws FileNotFoundException {
@@ -32,7 +30,7 @@ public class CardGame{
         try {
             File file = new File(filename);
             Scanner reader = new Scanner(file);
-            pack = new ArrayList<>();  // Create pack.
+            pack = new Stack<>();  // Create pack.
             while(reader.hasNextLine()){
                 count += 1;
                 String data = reader.nextLine();
@@ -47,7 +45,7 @@ public class CardGame{
 
                 // Add card to pack.
                 Card newCard = new Card(Integer.parseInt(data));
-                pack.add(newCard);
+                pack.push(newCard);
             }
             reader.close();
             if (count == (8 * playerNumber)){
@@ -63,7 +61,30 @@ public class CardGame{
         }
     }
 
-    public void distributeCards() {
+    public static void distributeCards() {
+        ArrayList<Object> gameOrder = new ArrayList<Object>();
+        for (int i=0 ; i<playerNumber; i++){
+            Player player = new Player(makeHand());
+            gameOrder.add(player);
+            System.out.println(player.toString());
+            CardDeck deck = new CardDeck(makeDeck());
+            System.out.println(deck.toString());
+        }
+    }
+
+    public static Card[] makeHand(){
+        Card[] hand = new Card[4];
+        for (int i=0 ; i < 4; i++){
+            hand[i] = pack.pop();
+        }
+        return hand;
+    }
+    public static Queue<Card> makeDeck() throws NullPointerException{
+        Queue<Card> deck = new LinkedList<Card>();
+        for(int i = 0; i<4 ; i++){
+            deck.add(pack.pop());
+        }
+        return deck;
 
     }
 }
