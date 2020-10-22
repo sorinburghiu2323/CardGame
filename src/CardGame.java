@@ -5,7 +5,7 @@ public class CardGame{
 
     private static int playerNumber;
     private static Stack<Card> pack;
-    private static ArrayList<Object> gameOrder;
+    private static CircularLL gameOrder;
 
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -49,6 +49,7 @@ public class CardGame{
             }
             reader.close();
             if (count == (8 * playerNumber)){
+                Collections.shuffle(pack);
                 return true;
             }
             else {
@@ -62,12 +63,13 @@ public class CardGame{
     }
 
     public static void distributeCards() {
-        ArrayList<Object> gameOrder = new ArrayList<Object>();
+
         for (int i=0 ; i<playerNumber; i++){
             Player player = new Player(makeHand());
-            gameOrder.add(player);
+            gameOrder.addNode(player);
             System.out.println(player.toString());
             CardDeck deck = new CardDeck(makeDeck());
+            gameOrder.addNode(deck);
             System.out.println(deck.toString());
         }
     }
