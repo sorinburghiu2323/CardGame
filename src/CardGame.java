@@ -38,9 +38,11 @@ public class CardGame{
                 // Check if line is an integer.
                 try {
                     Integer.parseInt(data);
+                    if (Integer.parseInt(data) < 0){
+                        throw new ArithmeticException("Card values must be a positive int");
+                    }
                 } catch (Exception e){
-                    System.out.println("File needs to contain only integers.");
-                    return false;
+                    throw new FileNotFoundException("File was not found");
                 }
 
                 // Add card to pack.
