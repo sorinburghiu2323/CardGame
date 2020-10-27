@@ -3,8 +3,10 @@ import java.util.Queue;
 public class CardDeck implements CardDeckInterface {
 
     private Queue<Card> deck;
+    private int deckID;
 
-    public CardDeck(Queue<Card> deck) {
+    public CardDeck(int deckID, Queue<Card> deck) {
+        this.deckID = deckID;
         this.deck = deck;
     }
 

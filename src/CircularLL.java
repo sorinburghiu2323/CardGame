@@ -26,15 +26,12 @@ public class CircularLL {
         newNode.prev = last;
         last.next = newNode;
     }
-    static void printNodes(){
+    static Object traverse(){
         Node temp = head;
         while(temp.next.next != head){
-            System.out.println(temp.prev.data);
-            System.out.println(temp.data);
-            System.out.println(temp.next.data);
             temp = temp.next.next;
         }
-        System.out.println(temp.data);
+        return temp.data;
     }
 
     public static void main(String[] args) {
@@ -54,13 +51,9 @@ public class CircularLL {
         deck2.add(new Card(26));
         deck2.add(new Card(36));
 
-        addNode(new Player(cards1));
-        addNode(new CardDeck(deck1));
-        addNode(new Player(cards2));
-        addNode(new CardDeck(deck2));
 
         //print the list
-        System.out.printf("Circular doubly linked list: ");
-        printNodes();
+        System.out.printf("Circular doubly linked list: \n");
+        System.out.println(CircularLL.traverse());
     }
 }

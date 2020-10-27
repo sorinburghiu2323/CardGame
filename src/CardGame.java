@@ -5,7 +5,9 @@ public class CardGame{
 
     private static int playerNumber;
     private static Stack<Card> pack;
-    private static CircularLL gameOrder;
+   // private static CircularLL gameOrder;
+    private static ArrayList<Player> playerArray = new ArrayList<Player>();
+    private static ArrayList<CardDeck> cardDeckArray = new ArrayList<CardDeck>();
 
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -21,6 +23,11 @@ public class CardGame{
             System.out.println("Please add correct pack.");
         }
         distributeCards();
+
+        for (int i =0 ; i<playerArray.size() - 1 ; i++){
+            Player temp = playerArray.get(i);
+            System.out.println(temp.getNextPlayer());
+        }
 
 
     }
@@ -67,13 +74,26 @@ public class CardGame{
     public static void distributeCards() {
 
         for (int i=0 ; i<playerNumber; i++){
-            Player player = new Player(makeHand());
-            gameOrder.addNode(player);
-            System.out.println(player.toString());
-            CardDeck deck = new CardDeck(makeDeck());
-            gameOrder.addNode(deck);
-            System.out.println(deck.toString());
+            Player player = new Player(i,makeHand());
+            playerArray.add(player);
+            CardDeck deck = new CardDeck(i,makeDeck());
+            cardDeckArray.add(deck);
         }
+        for (int j=0 ; j<=cardDeckArray.size() - 1 ; j++){
+            Player tempPlayer = playerArray.get(j);
+
+            if( j == cardDeckArray.size() - 1){
+                tempPlayer.setDiscard(cardDeckArray.get(0));
+                tempPlayer.setDraw(cardDeckArray.get(j));
+                tempPlayer.setNextPlayer(playerArray.get(0));
+            }
+            else{
+                tempPlayer.setDiscard(cardDeckArray.get(j+1));
+                tempPlayer.setDraw(cardDeckArray.get(j));
+                tempPlayer.setNextPlayer(playerArray.get(j+1));
+            }
+        }
+
     }
 
     public static Card[] makeHand(){
@@ -91,4 +111,22 @@ public class CardGame{
         return deck;
 
     }
+    /*
+    public void startGame(){
+        Thread player = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    playerArray.get(0).startTurn();
+                } catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    public void setPlayerValues(){
+        gameOrder.traverse();
+    }
+    */
+
 }
