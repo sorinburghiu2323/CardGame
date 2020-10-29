@@ -3,27 +3,22 @@ import java.util.Queue;
 public class CardDeck implements CardDeckInterface {
 
     private Queue<Card> deck;
-    private int deckID;
 
-    public CardDeck(int deckID, Queue<Card> deck) {
-        this.deckID = deckID;
+    public CardDeck(Queue<Card> deck) {
         this.deck = deck;
     }
 
-    @Override
     public void addCardToBottom(Card card) {
-
+//        System.out.println("Add " + deck);
+        deck.add(card);
     }
 
-    @Override
     public String toString() {
-        return "CardDeck{" +
-                "deck=" + deck +
-                '}';
+        return "Deck: " + deck;
     }
 
-    @Override
-    public Card removeCardFromTop(Card card) {
-        return null;
+    public Card removeCardFromTop() {
+//        System.out.println("Remove " + deck);
+        return deck.remove();
     }
 }

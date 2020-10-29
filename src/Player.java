@@ -1,13 +1,12 @@
 import java.util.Arrays;
-import java.util.LinkedList;
 
-public class Player implements PlayerInterface {
+public class Player extends Thread implements PlayerInterface {
 
-    private int playerID;
-    private Card[] hand = new Card[4];
+    private final int playerID;
+    private Card[] hand;
     private CardDeck discard;
     private CardDeck draw;
-    private Player nextPlayer;
+    private static boolean done = false;
 
     public Player(int playerID, Card[] hand) {
         this.playerID = playerID;
@@ -22,11 +21,6 @@ public class Player implements PlayerInterface {
         this.draw = draw;
     }
 
-
-    public void setNextPlayer(Player nextPlayer) {
-        this.nextPlayer = nextPlayer;
-    }
-
     @Override
     public String toString() {
         return "Player{" +
@@ -34,7 +28,6 @@ public class Player implements PlayerInterface {
                 ", hand=" + Arrays.toString(hand) +
                 ", discard=" + discard +
                 ", draw=" + draw +
-                ", nextPlayer=" + nextPlayer +
                 '}';
     }
 
@@ -50,11 +43,6 @@ public class Player implements PlayerInterface {
         return draw;
     }
 
-    public Player getNextPlayer() {
-        return nextPlayer;
-    }
-
-
     public Card[] getHand() {
         return hand;
     }
@@ -63,26 +51,47 @@ public class Player implements PlayerInterface {
         this.hand = hand;
     }
 
-    @Override
-    public Card drawCard(CardDeck cardDeck) {
-        return null;
+    public Card drawCard() {
+        return draw.removeCardFromTop();
     }
 
-    @Override
-    public void removeCard(CardDeck cardDeck, Card card) {
-
+    public void removeCard(Card card) {
+        discard.addCardToBottom(card);
     }
 
-    @Override
     public Boolean isWin() {
-        return null;
+        for (int i=0; i<4; i++) {
+            if (hand[i].getCardNumber() != playerID) {
+                return false;
+            }
+        }
+        return true;
     }
 
-
-    public void startTurn() {
-        while (true){
-            synchronized (this){
-
+    public void run(){
+        while (!done) {
+            synchronized (this) {
+                try {
+                    for (int i=0; i<4; i++) {
+                        if (hand[i].getCardNumber() != playerID) {
+                            Card tempCard = hand[i];
+                            hand[i] = drawCard();
+                            removeCard(tempCard);
+                            break;
+                        }
+                    }
+                    if (isWin()) {
+                        System.out.println(playerID + " has won.");
+                        notifyAll();
+                        this.done = true;
+                    }
+                    else {
+                        System.out.println(playerID + ": " + Arrays.toString(hand) + " finished turn.");
+                        Thread.sleep(5000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
