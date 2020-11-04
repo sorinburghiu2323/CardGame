@@ -96,6 +96,7 @@ public class Player extends Thread implements PlayerInterface {
                         done = true;
                         winner = getPlayerID();
                         writeToFile(playerID + " has informed the other players they've won");
+                        System.out.println("Player " + playerID + " has won");
                     } else {
                         Thread.sleep(100);
                     }
