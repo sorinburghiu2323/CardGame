@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class Player extends Thread implements PlayerInterface {
@@ -6,11 +9,14 @@ public class Player extends Thread implements PlayerInterface {
     private Card[] hand;
     private CardDeck discard;
     private CardDeck draw;
-    private static boolean done = false;
+    private volatile static boolean done = false;
+    private BufferedWriter writer;
+    private static int winner;
 
-    public Player(int playerID, Card[] hand) {
+    public Player(int playerID, Card[] hand, String fileName) throws IOException {
         this.playerID = playerID;
         this.hand = hand;
+        this.writer = new BufferedWriter(new FileWriter(fileName));
     }
 
     public void setDiscard(CardDeck discard) {
@@ -35,23 +41,7 @@ public class Player extends Thread implements PlayerInterface {
         return playerID;
     }
 
-    public CardDeck getDiscard() {
-        return discard;
-    }
-
-    public CardDeck getDraw() {
-        return draw;
-    }
-
-    public Card[] getHand() {
-        return hand;
-    }
-
-    public void setHand(Card[] hand) {
-        this.hand = hand;
-    }
-
-    public Card drawCard() {
+    public Card drawCard() throws IOException {
         return draw.removeCardFromTop();
     }
 
@@ -59,9 +49,10 @@ public class Player extends Thread implements PlayerInterface {
         discard.addCardToBottom(card);
     }
 
-    public Boolean isWin() {
-        for (int i=0; i<4; i++) {
-            if (hand[i].getCardNumber() != playerID) {
+    public synchronized Boolean isWin() {
+
+        for (int i=0; i<3; i++) {
+            if (hand[i].getCardNumber() != hand[i+1].getCardNumber()) {
                 return false;
             }
         }
@@ -69,32 +60,66 @@ public class Player extends Thread implements PlayerInterface {
     }
 
     public void run(){
+
+        try {
+            writeToFile(playerID + " initial hand: " + Arrays.toString(hand));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        boolean win_on_start = false;
+
         while (!done) {
             synchronized (this) {
                 try {
-                    for (int i=0; i<4; i++) {
-                        if (hand[i].getCardNumber() != playerID) {
-                            Card tempCard = hand[i];
-                            hand[i] = drawCard();
-                            removeCard(tempCard);
-                            break;
+                    if (!isWin() && !win_on_start) {
+                        for (int i = 0; i < 4; i++) {
+                            if (hand[i].getCardNumber() != playerID) {
+
+                                Card tempCard = hand[i];
+                                writeToFile(playerID + " has drawn a " + draw.getTopCard().getCardNumber());
+                                hand[i] = drawCard();
+
+                                writeToFile(playerID + " has discarded a " + tempCard.getCardNumber());
+                                removeCard(tempCard);
+
+                                writeToFile(playerID + " current hand: " + Arrays.toString(hand));
+
+                                break;
+                            }
                         }
                     }
-                    if (isWin()) {
-                        System.out.println(playerID + " has won.");
-                        notifyAll();
-                        this.done = true;
-                    }
                     else {
-                        System.out.println(playerID + ": " + Arrays.toString(hand) + " finished turn.");
-                        Thread.sleep(5000);
+                        win_on_start = true;
                     }
-                } catch (InterruptedException e) {
+                    if (isWin() && !done) {
+                        done = true;
+                        winner = getPlayerID();
+                        writeToFile(playerID + " has informed the other players they've won");
+                    } else {
+                        Thread.sleep(100);
+                    }
+                } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+        try {
+            if (playerID != winner) {
+                writeToFile(playerID + " has been informed by " + winner + " that they've won");
+            }
+            writeToFile(playerID + " final hand: " + Arrays.toString(hand));
+            writeToFile(playerID + " exits");
+            draw.writeToFile(playerID + " final deck: " + draw.getDeck());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    protected void writeToFile(String message) throws IOException {
+        this.writer.write(message);
+        this.writer.newLine();
+        this.writer.flush();
+    }
 }
 

@@ -8,7 +8,7 @@ public class CardGame{
     private static final ArrayList<Player> playerArray = new ArrayList<Player>();
     private static final ArrayList<CardDeck> cardDeckArray = new ArrayList<CardDeck>();
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the Card Game Sim!");
@@ -24,6 +24,7 @@ public class CardGame{
         else {
             distributeCards();
             startGame();
+            System.out.println("Running game...");
         }
     }
 
@@ -66,13 +67,13 @@ public class CardGame{
         }
     }
 
-    public static void distributeCards() {
+    public static void distributeCards() throws IOException {
 
         // Create player and cardDeck arrays.
         for (int i=1 ; i<=playerNumber; i++){
-            Player player = new Player(i,makeHand());
+            Player player = new Player(i, makeHand(), "player" + i + "_output.txt");
             playerArray.add(player);
-            CardDeck deck = new CardDeck(makeDeck());
+            CardDeck deck = new CardDeck(makeDeck(), "deck" + i + "_output.txt");
             cardDeckArray.add(deck);
         }
 

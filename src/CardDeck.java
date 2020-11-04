@@ -1,15 +1,23 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Queue;
 
 public class CardDeck implements CardDeckInterface {
 
     private Queue<Card> deck;
+    private BufferedWriter writer;
 
-    public CardDeck(Queue<Card> deck) {
+    public Queue<Card> getDeck() {
+        return deck;
+    }
+
+    public CardDeck(Queue<Card> deck, String fileName) throws IOException {
         this.deck = deck;
+        this.writer = new BufferedWriter(new FileWriter(fileName));
     }
 
     public void addCardToBottom(Card card) {
-//        System.out.println("Add " + deck);
         deck.add(card);
     }
 
@@ -18,7 +26,16 @@ public class CardDeck implements CardDeckInterface {
     }
 
     public Card removeCardFromTop() {
-//        System.out.println("Remove " + deck);
         return deck.remove();
+    }
+
+    public Card getTopCard() {
+        return deck.peek();
+    }
+
+    protected void writeToFile(String message) throws IOException {
+        this.writer.write(message);
+        this.writer.newLine();
+        this.writer.flush();
     }
 }
