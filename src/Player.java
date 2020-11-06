@@ -2,15 +2,16 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Player extends Thread implements PlayerInterface {
 
     private final int playerID;
     private Card[] hand;
-    private CardDeck discard;
-    private CardDeck draw;
-    private volatile static boolean done = false;
+    private CardDeck discardDeck;
+    private CardDeck drawDeck;
     private BufferedWriter writer;
+    private volatile static boolean done = false;
     private static int winner;
 
     public Player(int playerID, Card[] hand, String fileName) throws IOException {
@@ -19,12 +20,16 @@ public class Player extends Thread implements PlayerInterface {
         this.writer = new BufferedWriter(new FileWriter(fileName));
     }
 
-    public void setDiscard(CardDeck discard) {
-        this.discard = discard;
+    public void setDiscardDeck(CardDeck discardDeck) {
+        this.discardDeck = discardDeck;
     }
 
-    public void setDraw(CardDeck draw) {
-        this.draw = draw;
+    public void setDrawDeck(CardDeck drawDeck) {
+        this.drawDeck = drawDeck;
+    }
+
+    public int getPlayerID() {
+        return playerID;
     }
 
     @Override
@@ -32,23 +37,22 @@ public class Player extends Thread implements PlayerInterface {
         return "Player{" +
                 "playerID=" + playerID +
                 ", hand=" + Arrays.toString(hand) +
-                ", discard=" + discard +
-                ", draw=" + draw +
+                ", discard=" + discardDeck +
+                ", draw=" + drawDeck +
                 '}';
     }
 
-    public int getPlayerID() {
-        return playerID;
+    @Override
+    public Card drawCard() {
+        return drawDeck.removeCardFromTop();
     }
 
-    public Card drawCard() throws IOException {
-        return draw.removeCardFromTop();
-    }
-
+    @Override
     public void removeCard(Card card) {
-        discard.addCardToBottom(card);
+        discardDeck.addCardToBottom(card);
     }
 
+    @Override
     public synchronized Boolean isWin() {
 
         for (int i=0; i<3; i++) {
@@ -59,59 +63,83 @@ public class Player extends Thread implements PlayerInterface {
         return true;
     }
 
+    @Override
+    public void takeTurn() throws IOException {
+
+        // Generate array of integers from 0-3 in a random order.
+        Integer[] numbers = {0,1,2,3};
+        Collections.shuffle(Arrays.asList(numbers));
+
+        // Loop through the random array so the card discarded is random.
+        for (int i: numbers) {
+            if (hand[i].getCardNumber() != playerID) {
+
+                Card cardToDiscard = hand[i];
+
+                // Draw a card.
+                writeToFile(playerID + " has drawn a " + drawDeck.getTopCard().getCardNumber());
+                hand[i] = drawCard();
+
+                //Discard a card.
+                writeToFile(playerID + " has discarded a " + cardToDiscard.getCardNumber());
+                removeCard(cardToDiscard);
+
+                writeToFile(playerID + " current hand: " + Arrays.toString(hand));
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void hasWon() throws IOException {
+        done = true;
+        winner = getPlayerID();
+        writeToFile(playerID + " has informed the other players they've won");
+        System.out.println("Player " + playerID + " has won");
+    }
+
     public void run(){
 
+        // Add initial hand to player file.
         try {
             writeToFile(playerID + " initial hand: " + Arrays.toString(hand));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        boolean win_on_start = false;
+        boolean win_on_start = false;  // Boolean to account for winning starting hand condition.
 
+        // Thread loop.
         while (!done) {
             synchronized (this) {
                 try {
+                    // Let player take turn.
                     if (!isWin() && !win_on_start) {
-                        for (int i = 0; i < 4; i++) {
-                            if (hand[i].getCardNumber() != playerID) {
-
-                                Card tempCard = hand[i];
-                                writeToFile(playerID + " has drawn a " + draw.getTopCard().getCardNumber());
-                                hand[i] = drawCard();
-
-                                writeToFile(playerID + " has discarded a " + tempCard.getCardNumber());
-                                removeCard(tempCard);
-
-                                writeToFile(playerID + " current hand: " + Arrays.toString(hand));
-
-                                break;
-                            }
-                        }
-                    }
-                    else {
+                        takeTurn();
+                    } else {
                         win_on_start = true;
                     }
+
+                    // Check if player won this turn.
                     if (isWin() && !done) {
-                        done = true;
-                        winner = getPlayerID();
-                        writeToFile(playerID + " has informed the other players they've won");
-                        System.out.println("Player " + playerID + " has won");
+                        hasWon();
                     } else {
-                        Thread.sleep(100);
+                        Thread.sleep(100); // Small delay between turns.
                     }
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        // Output end text for each player.
         try {
             if (playerID != winner) {
                 writeToFile(playerID + " has been informed by " + winner + " that they've won");
             }
             writeToFile(playerID + " final hand: " + Arrays.toString(hand));
             writeToFile(playerID + " exits");
-            draw.writeToFile(playerID + " final deck: " + draw.getDeck());
+            drawDeck.writeToFile(playerID + " final deck: " + drawDeck.getDeck());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,5 @@
-public class Card {
-    private int cardNumber;
+public class Card{
+    private final int cardNumber;
 
     public Card(int cardNumber){
         this.cardNumber = cardNumber;
@@ -7,10 +7,6 @@ public class Card {
 
     public int getCardNumber() {
         return cardNumber;
-    }
-
-    public void setCardNumber(int cardNumber) {
-        this.cardNumber = cardNumber;
     }
 
     @Override

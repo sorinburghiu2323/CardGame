@@ -12,28 +12,33 @@ public class CardGame{
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the Card Game Sim!");
+
+        // Get number of players.
         System.out.println("How many players should play the game?");
         playerNumber = scanner.nextInt();
 
+        // Get name of deck file (e.g: pack.txt).
         System.out.println("What deck should they use?");
         String packName = scanner.next();
+
+        // Check the validity of the pack; start game if it's valid.
         Boolean isValidPack = cardPack(packName);
         if (!isValidPack) {
             System.out.println("Please add correct pack.");
-        }
-        else {
+        } else {
             distributeCards();
             startGame();
             System.out.println("Running game...");
         }
     }
 
-    public static Boolean cardPack(String filename) throws FileNotFoundException {
+    public static Boolean cardPack(String filename) throws ArithmeticException {
         int count = 0;
         try {
             File file = new File(filename);
             Scanner reader = new Scanner(file);
             pack = new Stack<>();  // Create pack.
+
             while(reader.hasNextLine()){
                 count += 1;
                 String data = reader.nextLine();
@@ -45,7 +50,7 @@ public class CardGame{
                         throw new ArithmeticException("Card values must be a positive int.");
                     }
                 } catch (Exception e){
-                    throw new FileNotFoundException("File was not found.");
+                    throw new ArithmeticException("Each line of the file must be a positive integer.");
                 }
 
                 // Add card to pack.
@@ -81,12 +86,12 @@ public class CardGame{
         for (int j=0 ; j<=cardDeckArray.size() - 1 ; j++){
             Player tempPlayer = playerArray.get(j);
             if ( j == cardDeckArray.size() - 1){
-                tempPlayer.setDiscard(cardDeckArray.get(0));
+                tempPlayer.setDiscardDeck(cardDeckArray.get(0));
             }
             else{
-                tempPlayer.setDiscard(cardDeckArray.get(j+1));
+                tempPlayer.setDiscardDeck(cardDeckArray.get(j+1));
             }
-            tempPlayer.setDraw(cardDeckArray.get(j));
+            tempPlayer.setDrawDeck(cardDeckArray.get(j));
         }
     }
 
@@ -108,10 +113,8 @@ public class CardGame{
     }
 
     public static void startGame(){
-
         for(int i=0; i<playerNumber; i++) {
             playerArray.get(i).start();
         }
-
     }
 }
