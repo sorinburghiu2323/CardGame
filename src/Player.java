@@ -6,7 +6,7 @@ import java.util.Collections;
 
 public class Player extends Thread implements PlayerInterface {
 
-    private final int playerID;
+    private int playerID;
     private Card[] hand;
     private CardDeck discardDeck;
     private CardDeck drawDeck;
@@ -30,6 +30,15 @@ public class Player extends Thread implements PlayerInterface {
 
     public int getPlayerID() {
         return playerID;
+    }
+    public void setPlayerID(int id){
+        this.playerID = id;
+    }
+
+    public void setHand(CardDeck cardDeck){
+        for (int i = 0; i < 4; i++) {
+            this.hand[i] = cardDeck.removeCardFromTop();
+        }
     }
 
     @Override
