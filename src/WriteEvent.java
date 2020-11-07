@@ -15,6 +15,9 @@ public class WriteEvent extends EventObject {
         this.message = message;
     }
 
+    /**
+     * @return 
+     */
     public String getMessage() {
         return message;
     }
