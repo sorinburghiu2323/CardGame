@@ -10,7 +10,7 @@ import java.util.*;
  *      - Distributing cards to players and decks.
  *      - Start the game by starting the Player threads.
  */
-public class CardGame{
+public class CardGame {
 
     private static int playerNumber;
     private static Stack<Card> pack;  // Pack read from given file.

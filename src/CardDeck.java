@@ -16,11 +16,11 @@ public class CardDeck implements CardDeckInterface {
     private BufferedWriter writer;  // Writer attribute for writing to file.
 
     /**
-     * CardDeck initializer.
+     * CardDeck constructor.
      *
      * @param deck - Queue of cards.
      * @param fileName - File name to where the writer needs to write to.
-     * @throws IOException
+     * @throws IOException - when writing to file is not possible.
      */
     public CardDeck(Queue<Card> deck, String fileName) throws IOException {
         this.deck = deck;
@@ -76,7 +76,7 @@ public class CardDeck implements CardDeckInterface {
      * Adds given text on a new line of the file.
      *
      * @param message - String with text needed to be added to file.
-     * @throws IOException
+     * @throws IOException - when writing to file is not possible.
      */
     protected void writeToFile(String message) throws IOException {
         this.writer.write(message);

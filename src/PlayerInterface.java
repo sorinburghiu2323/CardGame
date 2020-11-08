@@ -23,9 +23,9 @@ public interface PlayerInterface {
      * Analyse player's hand to see is it is a winning hand.
      * A winning hand must have 4 Cards with the same card number.
      *
-     * @return Boolean - True if winning hand; otherwise False.
+     * @return boolean - True if winning hand; otherwise False.
      */
-    Boolean isWin();
+    boolean isWin();
 
     /**
      * Method to combine the other method to create the effect of a "turn".
@@ -36,7 +36,7 @@ public interface PlayerInterface {
      * During a player's turn, their action must be recorded in their adequate
      * player log.
      *
-     * @throws IOException
+     * @throws IOException - when writing to file is not possible.
      */
     void takeTurn() throws IOException;
 
@@ -48,7 +48,7 @@ public interface PlayerInterface {
      *
      * This must be reflected in the player logs.
      *
-     * @throws IOException
+     * @throws IOException - when writing to file is not possible.
      */
     void hasWon() throws IOException;
 }
