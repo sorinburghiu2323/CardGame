@@ -74,7 +74,7 @@ public class CardGame {
             InvalidNumberOfCardsException, FileNotFoundException {
 
         int count = 0;
-        File file = new File(filename);  // Throws exception by default if file cannot be found.
+        FileInputStream file = new FileInputStream(filename);  // Throws exception by default if file cannot be found.
         Scanner reader = new Scanner(file);
         pack = new Stack<>();  // Create pack.
 
