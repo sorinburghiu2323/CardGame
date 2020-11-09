@@ -112,10 +112,14 @@ public class CardGame {
      */
     public static void distributeCards() throws IOException {
 
-        // Create player and cardDeck arrays.
+        // Distribute cards to players.
         for (int i=1 ; i<=playerNumber; i++){
             Player player = new Player(i, makeHand(), "player" + i + "_output.txt");
             playerArray.add(player);
+        }
+
+        // Distribute cards to decks.
+        for (int i=1 ; i<=playerNumber; i++){
             CardDeck deck = new CardDeck(makeDeck(), "deck" + i + "_output.txt");
             cardDeckArray.add(deck);
         }
